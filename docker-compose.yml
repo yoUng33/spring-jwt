@@ -1,0 +1,22 @@
+version: "3"
+services:
+  mysqldb:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=my_test_db
+    ports:
+      - 3307:3306
+
+  server:
+    build: .
+    restart: always
+    image: chegg-spring-jwt
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/my_test_db?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+    depends_on:
+      - mysqldb
+    command: sh -c './wait-for mysqldb:3316 -- npm start'
